@@ -9,9 +9,8 @@ public class Program {
 	public static void main(String[] args) {
 		
 		SellerDao sd = DaoFactory.createSellerDao();
-		
 		Seller seller = sd.findById(3);
-		System.out.println(seller);
+		System.out.println(seller!=null ? seller : "Não encontrado");
 		
 	}
 

@@ -2,12 +2,14 @@ package model.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Seller implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private Integer id;
 	private String name;
 	private String email;
@@ -84,13 +86,26 @@ public class Seller implements Serializable{
 		Seller other = (Seller) obj;
 		return Objects.equals(id, other.id);
 	}
-	
-	
 	@Override
 	public String toString() {
-		return "Seller [id=" + id + ", name=" + name + ", email=" + email + ", birthDate=" + birthDate + ", baseSalary="
-				+ baseSalary + ", department=" + department + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("Seller ");
+		builder.append(id);
+		builder.append(": ");
+		builder.append(name);
+		builder.append("[");
+		builder.append(birthDate.format(dtf));
+		builder.append("] - ");
+		builder.append(email);
+		builder.append(", baseSalary= $");
+		builder.append(baseSalary);
+		builder.append(" | From department ");
+		builder.append(department);
+		return builder.toString();
 	}
+	
+	
+	
 	
 	
 	

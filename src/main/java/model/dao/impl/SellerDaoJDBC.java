@@ -43,6 +43,7 @@ public class SellerDaoJDBC implements SellerDao {
 	public Seller findById(Integer id) {
 		PreparedStatement st = null;
 		ResultSet rs = null;
+
 		try {
 			st = conn.prepareStatement("SELECT seller.*, department.Name AS DepName "
 					+ "FROM seller INNER JOIN department "
@@ -50,22 +51,15 @@ public class SellerDaoJDBC implements SellerDao {
 					+ "WHERE seller.Id = ? ");
 			st.setInt(1, id);
 			rs = st.executeQuery();
-			if(rs.next()) {
-				Department derp = new Department();
-				derp.setId(rs.getInt("DepartmentId")); //seller.DerpartmentId (Esse e o ID) = department.Id
-				derp.setName(rs.getString("DepName"));
-				Seller seller = new Seller();
-				seller.setId(rs.getInt("Id"));
-				seller.setName(rs.getString("Name"));
-				seller.setEmail(rs.getString("Email"));
-				seller.setBaseSalary(rs.getDouble("BaseSalary"));
-				LocalDate datee = rs.getDate("BirthDate").toLocalDate();
-				seller.setDepartment(derp);
-				seller.setBirthDate(datee);
-				return seller;
 
+			if(rs.next()) {
+				Department derp = instantiateDepartment(rs);
+				Seller seller = instantiateSeller(rs, st, derp);
+				return seller;
 			}
+			
 			return null;
+			
 		}catch(SQLException e) {
 			throw new DbException("Erro :" + e.getLocalizedMessage());
 		} finally {
@@ -80,4 +74,22 @@ public class SellerDaoJDBC implements SellerDao {
 		return null;
 	}
 
+	private Seller instantiateSeller(ResultSet rs, PreparedStatement st, Department derp) throws SQLException {
+		Seller seller = new Seller();
+		seller.setId(rs.getInt("Id"));
+		seller.setName(rs.getString("Name"));
+		seller.setEmail(rs.getString("Email"));
+		seller.setBaseSalary(rs.getDouble("BaseSalary"));
+		LocalDate datee = rs.getDate("BirthDate").toLocalDate();
+		seller.setDepartment(derp);
+		seller.setBirthDate(datee);
+		return seller;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException{
+		Department derp = new Department();
+		derp.setId(rs.getInt("DepartmentId")); //seller.DerpartmentId (Esse e o ID) = department.Id
+		derp.setName(rs.getString("DepName"));
+		return derp;
+	}
 }
