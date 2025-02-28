@@ -11,7 +11,6 @@ public class Department implements Serializable{
 	
 	private Integer id;
 	private String name;
-	List<Seller>sellers=new ArrayList<>();
 
 	public Department () {
 	}
@@ -31,11 +30,7 @@ public class Department implements Serializable{
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public List<Seller> getSellers() {
-		return sellers;
-	}
-
+	} 
 	
 	@Override
 	public int hashCode() {
@@ -56,7 +51,7 @@ public class Department implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "Department [id=" + id + ", name=" + name + ", sellers=" + sellers + "]";
+		return "Department [id=" + id + ", name=" + name + "]";
 	}
 
 }
