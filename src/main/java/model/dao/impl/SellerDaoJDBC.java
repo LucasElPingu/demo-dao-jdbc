@@ -1,9 +1,11 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,17 +29,62 @@ public class SellerDaoJDBC implements SellerDao {
 	//=======================================================================================================================================
 
 	@Override
-	public void insert(Seller Seller) {
-		// TODO Auto-generated method stub
+	public void insert(Seller seller) {
+		PreparedStatement st = null;
 
+		try {
+			st = conn.prepareStatement("INSERT "
+					+ "INTO seller(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES (?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
+
+			st.setString(1, seller.getName());
+			st.setString(2, seller.getEmail());
+			st.setDate(3, Date.valueOf(seller.getBirthDate()));
+			st.setDouble(4, seller.getBaseSalary());
+			st.setInt(5, seller.getDepartment().getId());
+			int rows = st.executeUpdate();
+
+			if(rows > 0) {
+				ResultSet rs = st.getGeneratedKeys();
+				if(rs.next()) {
+					int id = rs.getInt(1);
+					seller.setId(id);
+				}
+				DB.closeResultSet(rs);
+			} else throw new DbException("Error: Rows not affected!!!");
+
+		}catch(SQLException e) {
+			throw new DbException("Erro :" + e.getLocalizedMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	//=======================================================================================================================================
 
 	@Override
-	public void update(Seller Seller) {
-		// TODO Auto-generated method stub
+	public void update(Seller seller) {
+		PreparedStatement st = null;
 
+		try {
+			st = conn.prepareStatement("UPDATE seller "
+					+ "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
+					+ "WHERE Id = ?");
+
+			st.setString(1, seller.getName());
+			st.setString(2, seller.getEmail());
+			st.setDate(3, Date.valueOf(seller.getBirthDate()));
+			st.setDouble(4, seller.getBaseSalary());
+			st.setInt(5, seller.getDepartment().getId());
+			st.setInt(6, seller.getId());
+			st.executeUpdate();
+
+		}catch(SQLException e) {
+			throw new DbException("Erro :" + e.getLocalizedMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	//=======================================================================================================================================
@@ -109,7 +156,7 @@ public class SellerDaoJDBC implements SellerDao {
 				Seller seller = instantiateSeller(rs, derp);
 				sellerList.add(seller);
 			}
-			
+
 			return sellerList;
 
 		}catch(SQLException e) {
@@ -135,7 +182,7 @@ public class SellerDaoJDBC implements SellerDao {
 					+ "FROM seller INNER JOIN department "
 					+ "ON DepartmentId=department.Id "
 					+ "ORDER BY seller.Name;");
-			
+
 			rs = st.executeQuery();
 
 			while(rs.next()) {
@@ -150,7 +197,7 @@ public class SellerDaoJDBC implements SellerDao {
 				Seller seller = instantiateSeller(rs, derp);
 				sellerList.add(seller);
 			}
-			
+
 			return sellerList;
 
 		}catch(SQLException e) {
@@ -182,7 +229,7 @@ public class SellerDaoJDBC implements SellerDao {
 		derp.setName(rs.getString("DepName"));
 		return derp;
 	}
-	
+
 	//=======================================================================================================================================
 
 }
