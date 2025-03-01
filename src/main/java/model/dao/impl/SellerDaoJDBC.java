@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -21,11 +24,15 @@ public class SellerDaoJDBC implements SellerDao {
 		this.conn = conn;
 	}
 
+	//=======================================================================================================================================
+
 	@Override
 	public void insert(Seller Seller) {
 		// TODO Auto-generated method stub
 
 	}
+
+	//=======================================================================================================================================
 
 	@Override
 	public void update(Seller Seller) {
@@ -33,11 +40,15 @@ public class SellerDaoJDBC implements SellerDao {
 
 	}
 
+	//=======================================================================================================================================
+
 	@Override
 	public void deleteById(Integer id) {
 		// TODO Auto-generated method stub
 
 	}
+
+	//=======================================================================================================================================
 
 	@Override
 	public Seller findById(Integer id) {
@@ -54,12 +65,12 @@ public class SellerDaoJDBC implements SellerDao {
 
 			if(rs.next()) {
 				Department derp = instantiateDepartment(rs);
-				Seller seller = instantiateSeller(rs, st, derp);
+				Seller seller = instantiateSeller(rs, derp);
 				return seller;
 			}
-			
+
 			return null;
-			
+
 		}catch(SQLException e) {
 			throw new DbException("Erro :" + e.getLocalizedMessage());
 		} finally {
@@ -68,13 +79,58 @@ public class SellerDaoJDBC implements SellerDao {
 		}
 	}
 
+	//=======================================================================================================================================
+
+	@Override
+	public List<Seller> findByDepartment(Department dep) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		Map<Integer, Department>depMap = new HashMap<>();
+		List<Seller> sellerList = new ArrayList<>();
+
+		try {
+			st = conn.prepareStatement("SELECT seller.*, department.Name AS DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON DepartmentId=department.Id "
+					+ "WHERE DepartmentId = ? "
+					+ "ORDER BY seller.Name;");
+			st.setInt(1, dep.getId());
+			rs = st.executeQuery();
+
+			while(rs.next()) {
+
+				Department derp = depMap.get(rs.getInt("DepartmentId"));
+
+				if(derp == null) {
+					derp = instantiateDepartment(rs);
+					depMap.put(rs.getInt("DepartmentId"), derp);
+				}
+
+				Seller seller = instantiateSeller(rs, derp);
+				sellerList.add(seller);
+			}
+			
+			return sellerList;
+
+		}catch(SQLException e) {
+			throw new DbException("Erro :" + e.getMessage());
+		} finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
+
+	}
+
+	//=======================================================================================================================================
+
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private Seller instantiateSeller(ResultSet rs, PreparedStatement st, Department derp) throws SQLException {
+	//=======================================================================================================================================
+
+	private Seller instantiateSeller(ResultSet rs, Department derp) throws SQLException {
 		Seller seller = new Seller();
 		seller.setId(rs.getInt("Id"));
 		seller.setName(rs.getString("Name"));
@@ -92,4 +148,5 @@ public class SellerDaoJDBC implements SellerDao {
 		derp.setName(rs.getString("DepName"));
 		return derp;
 	}
+
 }
