@@ -99,7 +99,7 @@ public class SellerDaoJDBC implements SellerDao {
 
 			while(rs.next()) {
 
-				Department derp = depMap.get(rs.getInt("DepartmentId"));
+				Department derp = depMap.get(rs.getInt("DepartmentId")); //verifica se existe a chave para retornar o valor, no caso o Department
 
 				if(derp == null) {
 					derp = instantiateDepartment(rs);
@@ -125,11 +125,45 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public List<Seller> findAll() {
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		Map<Integer, Department>depMap = new HashMap<>();
+		List<Seller> sellerList = new ArrayList<>();
+
+		try {
+			st = conn.prepareStatement("SELECT seller.*, department.Name AS DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON DepartmentId=department.Id "
+					+ "ORDER BY seller.Name;");
+			
+			rs = st.executeQuery();
+
+			while(rs.next()) {
+
+				Department derp = depMap.get(rs.getInt("DepartmentId")); //verifica se existe a chave para retornar o valor, no caso o Department
+
+				if(derp == null) {
+					derp = instantiateDepartment(rs);
+					depMap.put(rs.getInt("DepartmentId"), derp);
+				}
+
+				Seller seller = instantiateSeller(rs, derp);
+				sellerList.add(seller);
+			}
+			
+			return sellerList;
+
+		}catch(SQLException e) {
+			throw new DbException("Erro :" + e.getMessage());
+		} finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
 	}
 
 	//=======================================================================================================================================
 
+	//Instanciação dos Objetos (Reutilização)
 	private Seller instantiateSeller(ResultSet rs, Department derp) throws SQLException {
 		Seller seller = new Seller();
 		seller.setId(rs.getInt("Id"));
@@ -148,5 +182,7 @@ public class SellerDaoJDBC implements SellerDao {
 		derp.setName(rs.getString("DepName"));
 		return derp;
 	}
+	
+	//=======================================================================================================================================
 
 }

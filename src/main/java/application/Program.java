@@ -24,8 +24,11 @@ public class Program {
 			sellerList.forEach(System.out::println);
 		else System.out.println("Departamente não inexistente!!!");
 		System.out.println("==================================================================================================================");
-		System.out.println("\n==================================================findByDepartment===============================================");
-
+		System.out.println("\n==================================================findAll=======================================================");
+		List<Seller> sellerListAll = sd.findAll();
+		if(!sellerList.isEmpty()) //Verifica se a lista esta vazia
+			sellerListAll.forEach(System.out::println);
+		else System.out.println("Nenhum valor encontrado!!!");
 		System.out.println("==================================================================================================================");
 	}
 
