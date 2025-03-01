@@ -1,21 +1,18 @@
 package application;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import model.dao.DaoFactory;
+import model.dao.DepartmentDao;
 import model.dao.SellerDao;
-import model.dao.impl.SellerDaoJDBC;
 import model.entities.Department;
-import model.entities.Seller;
 
 public class Program {
 
 	public static void main(String[] args) {
 
 		SellerDao sd = DaoFactory.createSellerDao();
-
+		/*
 		System.out.println("==================================================findById=======================================================");
 		Seller seller = sd.findById(3);
 		System.out.println(seller!=null ? seller : "Não encontrado");
@@ -47,6 +44,32 @@ public class Program {
 		sd.deleteById(72);
 		System.out.println("Employee Deleted!!!");
 		System.out.println("==================================================================================================================");
+		 */
+		/*
+		DepartmentDao dp = DaoFactory.createDepartmentDao();
+		Department d = new Department();
+		System.out.println("==================================================findById=======================================================");
+		d = dp.findById(6);
+		System.out.println(d!=null ? d : "Não encontrado");
+		System.out.println("=================================================================================================================");
+		System.out.println("\n==================================================findAll=======================================================");
+		List<Department> dList = dp.findAll();
+		dList.forEach(System.out::println);
+		System.out.println("==================================================================================================================");
+		System.out.println("\n==================================================Insert========================================================");
+		d = new Department(null, "ZECA");
+		dp.insert(d);
+		System.out.println("Department: " + d.getId() + " Created!!!");
+		System.out.println("==================================================================================================================");
+		System.out.println("\n==================================================Update========================================================");
+		d = new Department(6, "ZECA_CU_DE_APITO");
+		dp.update(d);
+		System.out.println("Update Completed!!!");
+		System.out.println("==================================================================================================================");
+		System.out.println("\n==================================================Delete========================================================");
+		dp.deleteById(6);
+		System.out.println("Department Deleted!!!");
+		System.out.println("==================================================================================================================");
+		 */
 	}
-
 }
